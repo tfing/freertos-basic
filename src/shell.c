@@ -25,6 +25,8 @@ void host_command(int, char **);
 void mmtest_command(int, char **);
 void test_command(int, char **);
 void _command(int, char **);
+void new_command(int, char **);
+void save_command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
 
@@ -37,6 +39,8 @@ cmdlist cl[]={
 	MKCL(mmtest, "heap memory allocation test"),
 	MKCL(help, "help"),
 	MKCL(test, "test new function"),
+    MKCL(new, "create new task"),
+    MKCL(save, "save current sysinfo"),
 	MKCL(, ""),
 };
 
@@ -189,6 +193,54 @@ void test_command(int n, char *argv[]) {
 void _command(int n, char *argv[]){
     (void)n; (void)argv;
     fio_printf(1, "\r\n");
+}
+
+void dummy_task(void *pvParameters)
+{
+    for(;;){ vTaskDelay(1000);}
+}
+
+void new_command(int n, char *argv[]){
+    (void)n; (void)argv;
+    int i;
+    for (i = 0; i < 100; i++)
+    {
+        portBASE_TYPE k = xTaskCreate(dummy_task,
+                (signed portCHAR *) "new",
+                128, NULL, tskIDLE_PRIORITY + 1, NULL);
+        if (k == pdPASS ) 
+            fio_printf(1, "succ:%d\r\n", i);
+    }
+    fio_printf(1, "\r\n");
+}
+
+void save_command(int n, char *argv[]){
+    int handle;
+    //char *str = "hello file\r\n";
+    int ret;
+	signed char buf[1024] = {0};
+
+    handle = host_action(SYS_OPEN, "my_test_file", 4);
+    if(handle == -1) {
+        fio_printf(1, "Open file error!\r\n");
+        return;
+    }
+
+	vTaskList(buf);
+    //fio_printf(1, "\n\rName          State   Priority  Stack  Num\n\r");
+    //fio_printf(1, "*******************************************\n\r");
+	//fio_printf(1, "%s\r\n", buf + 2);	
+
+    ret = host_action(SYS_WRITE, handle, buf, 1024);
+    if (ret) {
+        fio_printf(1, "Write error:%d\r\n", ret);
+        return;
+    }
+    ret = host_action(SYS_CLOSE, handle);
+    fio_printf(1, "\r\n");
+
+
+    host_action(SYS_SYSTEM, "mkdir hehe");
 }
 
 cmdfunc *do_command(const char *cmd){
