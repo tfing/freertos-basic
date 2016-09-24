@@ -69,6 +69,7 @@ $(OUTDIR)/$(TARGET).lst: $(OUTDIR)/$(TARGET).elf
 	@echo "    LIST    "$@
 	@$(CROSS_COMPILE)objdump -S $< > $@
 
+# romfs is included in DAT
 $(OUTDIR)/$(TARGET).elf: $(OBJ) $(DAT)
 	@echo "    LD      "$@
 	@echo "    MAP     "$(OUTDIR)/$(TARGET).map

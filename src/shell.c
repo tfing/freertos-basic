@@ -66,7 +66,7 @@ int parse_command(char *str, char *argv[]){
 }
 
 void ls_command(int n, char *argv[]){
-    fio_printf(1,"\r\n"); 
+    fio_printf(1,"\r\n");
     int dir;
     if(n == 0){
         dir = fs_opendir("");
@@ -77,7 +77,7 @@ void ls_command(int n, char *argv[]){
         fio_printf(1, "Too many argument!\r\n");
         return;
     }
-(void)dir;   // Use dir
+    fio_printf(1, "%d\n", dir);
 }
 
 int filedump(const char *filename){
@@ -94,7 +94,7 @@ int filedump(const char *filename){
 	while((count=fio_read(fd, buf, sizeof(buf)))>0){
 		fio_write(1, buf, count);
     }
-	
+
     fio_printf(1, "\r");
 
 	fio_close(fd);
@@ -106,7 +106,7 @@ void ps_command(int n, char *argv[]){
 	vTaskList(buf);
         fio_printf(1, "\n\rName          State   Priority  Stack  Num\n\r");
         fio_printf(1, "*******************************************\n\r");
-	fio_printf(1, "%s\r\n", buf + 2);	
+	fio_printf(1, "%s\r\n", buf + 2);
 }
 
 void cat_command(int n, char *argv[]){
@@ -150,7 +150,7 @@ void host_command(int n, char *argv[]){
         command[len - 1] = '\0';
         rnt=host_action(SYS_SYSTEM, command);
         fio_printf(1, "\r\nfinish with exit code %d.\r\n", rnt);
-    } 
+    }
     else {
         fio_printf(2, "\r\nUsage: host 'command'\r\n");
     }
@@ -169,7 +169,7 @@ void test_command(int n, char *argv[]) {
     int error;
 
     fio_printf(1, "\r\n");
-    
+
     handle = host_action(SYS_SYSTEM, "mkdir -p output");
     handle = host_action(SYS_SYSTEM, "touch output/syslog");
 
@@ -208,7 +208,7 @@ void new_command(int n, char *argv[]){
         portBASE_TYPE k = xTaskCreate(dummy_task,
                 (signed portCHAR *) "new",
                 128, NULL, tskIDLE_PRIORITY + 1, NULL);
-        if (k == pdPASS ) 
+        if (k == pdPASS )
             fio_printf(1, "succ:%d\r\n", i);
     }
     fio_printf(1, "\r\n");
@@ -229,7 +229,7 @@ void save_command(int n, char *argv[]){
 	vTaskList(buf);
     //fio_printf(1, "\n\rName          State   Priority  Stack  Num\n\r");
     //fio_printf(1, "*******************************************\n\r");
-	//fio_printf(1, "%s\r\n", buf + 2);	
+	//fio_printf(1, "%s\r\n", buf + 2);
 
     ret = host_action(SYS_WRITE, handle, buf, 1024);
     if (ret) {
@@ -240,7 +240,6 @@ void save_command(int n, char *argv[]){
     fio_printf(1, "\r\n");
 
 
-    host_action(SYS_SYSTEM, "mkdir hehe");
 }
 
 cmdfunc *do_command(const char *cmd){
@@ -251,5 +250,5 @@ cmdfunc *do_command(const char *cmd){
 		if(strcmp(cl[i].name, cmd)==0)
 			return cl[i].fptr;
 	}
-	return NULL;	
+	return NULL;
 }

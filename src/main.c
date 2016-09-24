@@ -178,7 +178,7 @@ int main()
     
     fs_init();
     fio_init();
-    
+    register_devfs();
     register_romfs("romfs", &_sromfs);
     
     /* Create the queue used by the serial task.  Messages for write to
@@ -188,7 +188,6 @@ int main()
      * Reference: www.freertos.org/a00116.html */
     serial_rx_queue = xQueueCreate(1, sizeof(char));
 
-    register_devfs();
     /* Create a task to output text read from romfs. */
     xTaskCreate(command_prompt,
                 (signed portCHAR *) "CLI",
